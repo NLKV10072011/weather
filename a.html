@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .box {
+            border: 10px solid #ccc;
+            padding: 50px;
+            margin: 100px auto;
+            width: 320px;
+            text-align: center;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        select {
+            padding: 12px;
+            font-size: 16px;
+            width: 200px;
+            margin-top: 20px;
+            border-radius: 5px;
+            border: 2px solid #ccc;
+            background-color: #f7f7f7;
+        }
+
+        .weather-icon {
+            font-size: 40px;
+            margin-top: 10px;
+        }
+
+        .icon-facebook {
+            font-size: 18px;
+            color: #3b5998;
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .temperature {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .rainChance {
+            font-size: 18px;
+            color: #777;
+        }
+    </style>
+    <title>Dự Báo Thời Tiết</title>
+</head>
+<body>
+    <header>
+        <h1>Thời Tiết Việt Nam</h1>
+    </header>
+
+    <main>
+        <div class="box">
+            <h2>Dự Báo Thời Tiết</h2>
+            <p>Chọn thành phố để xem nhiệt độ và tình trạng thời tiết:</p>
+
+            <select id="citySelect">
+                <option value="Hà Nội">Hà Nội</option>
+                <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+                <option value="Đà Nẵng">Đà Nẵng</option>
+                <option value="Cần Thơ">Cần Thơ</option>
+                <option value="Nha Trang">Nha Trang</option>
+                <!-- Thêm các thành phố khác nếu cần -->
+            </select>
+
+            <p id="locationName"></p>
+            <p id="temperature" class="temperature">Chọn thành phố để xem nhiệt độ.</p>
+            <p id="rainChance" class="rainChance"></p>
+            <p id="humidity"></p>
+            <p id="windSpeed"></p>
+            <p id="weatherIcon" class="weather-icon"></p>
+        </div>
+
+        <a href="https://www.facebook.com/profile.php?id=100073017864297" target="_blank" class="icon-facebook">
+            <i class="fab fa-facebook"></i> Truy cập Facebook
+        </a>
+    </main>
+
+    <footer>
+        <p>&copy;2024 Nguyễn Văn</p>
+        <p>&hearts; Chúc bạn một ngày tốt lành!</p>
+    </footer>
+
+    <script>
+        const apiKey = '8fd66b221e46464492e45800242211';  // API Key của bạn
+        const citySelect = document.getElementById('citySelect');
+        const temperatureDisplay = document.getElementById('temperature');
+        const rainChanceDisplay = document.getElementById('rainChance');
+        const humidityDisplay = document.getElementById('humidity');
+        const windSpeedDisplay = document.getElementById('windSpeed');
+        const locationNameDisplay = document.getElementById('locationName');
+        const weatherIconDisplay = document.getElementById('weatherIcon');
+
+        citySelect.addEventListener('change', updateWeather);
+
+        // Hàm lấy dữ liệu thời tiết từ API
+        function updateWeather() {
+            const cityName = citySelect.value;
+            fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${cityName}&lang=vi`)
+                .then(response => response.json())
+                .then(data => {
+                    // Lấy thông tin cần thiết
+                    const temperature = data.current.temp_c;
+                    const weatherCondition = data.current.condition.text;
+                    const weatherIcon = data.current.condition.icon;
+                    const humidity = data.current.humidity;
+                    const windSpeed = data.current.wind_kph;
+
+                    // Hiển thị thông tin thời tiết
+                    temperatureDisplay.textContent = `Nhiệt độ tại ${cityName}: ${temperature}°C`;
+                    rainChanceDisplay.textContent = `Tình trạng thời tiết: ${weatherCondition}`;
+                    humidityDisplay.textContent = `Độ ẩm: ${humidity}%`;
+                    windSpeedDisplay.textContent = `Tốc độ gió: ${windSpeed} km/h`;
+                    locationNameDisplay.textContent = `Thành phố: ${cityName}`;
+                    weatherIconDisplay.innerHTML = `<img src="https:${weatherIcon}" alt="weather icon" />`;
+                })
+                .catch(error => {
+                    console.error('Có lỗi khi lấy dữ liệu:', error);
+                    temperatureDisplay.textContent = 'Lỗi kết nối API.';
+                });
+        }
+
+        // Thêm sự kiện mặc định khi tải trang (hiển thị thời tiết cho thành phố mặc định)
+        window.onload = function() {
+            citySelect.dispatchEvent(new Event('change'));
+        };
+    </script>
+</body>
+</html>
