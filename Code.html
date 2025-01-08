@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>🌤️ Dự Báo Thời Tiết</title>
+    <style>
+        /* From Uiverse.io by zanina-yassine */
+        .card {
+            width: 350px;
+            height: 235px;
+            position: relative;
+            padding: 25px;
+            background: radial-gradient(178.94% 106.41% at 26.42% 106.41%, #FFF7B1 0%, rgba(255, 255, 255, 0) 71.88%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, #FFFFFF;
+            box-shadow: 0px 155px 62px rgba(0, 0, 0, 0.01), 0px 87px 52px rgba(0, 0, 0, 0.05), 0px 39px 39px rgba(0, 0, 0, 0.09), 0px 10px 21px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
+            border-radius: 23px;
+            transition: all 0.8s cubic-bezier(0.15, 0.83, 0.66, 1);
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .container {
+            width: 250px;
+            height: 250px;
+            position: absolute;
+            right: -35px;
+            top: -50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0.7);
+        }
+
+        .cloud {
+            width: 250px;
+        }
+
+        .front {
+            padding-top: 45px;
+            margin-left: 25px;
+            display: inline;
+            position: absolute;
+            z-index: 11;
+            animation: clouds 8s infinite;
+            animation-timing-function: ease-in-out;
+        }
+
+        .back {
+            margin-top: -30px;
+            margin-left: 150px;
+            z-index: 12;
+            animation: clouds 12s infinite;
+            animation-timing-function: ease-in-out;
+        }
+
+        .right-front {
+            width: 45px;
+            height: 45px;
+            border-radius: 50% 50% 50% 0%;
+            background-color: #4c9beb;
+            display: inline-block;
+            margin-left: -25px;
+            z-index: 5;
+        }
+
+        .left-front {
+            width: 65px;
+            height: 65px;
+            border-radius: 50% 50% 0% 50%;
+            background-color: #4c9beb;
+            display: inline-block;
+            z-index: 5;
+        }
+
+        .right-back {
+            width: 50px;
+            height: 50px;
+            border-radius: 50% 50% 50% 0%;
+            background-color: #4c9beb;
+            display: inline-block;
+            margin-left: -20px;
+            z-index: 5;
+        }
+
+        .left-back {
+            width: 30px;
+            height: 30px;
+            border-radius: 50% 50% 0% 50%;
+            background-color: #4c9beb;
+            display: inline-block;
+            z-index: 5;
+        }
+
+        .sun {
+            width: 120px;
+            height: 120px;
+            background: -webkit-linear-gradient(to right, #fcbb04, #fffc00);
+            background: linear-gradient(to right, #fcbb04, #fffc00);
+            border-radius: 60px;
+            display: inline;
+            position: absolute;
+        }
+
+        .sunshine {
+            animation: sunshines 2s infinite;
+        }
+
+        @keyframes sunshines {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes clouds {
+            0% {
+                transform: translateX(15px);
+            }
+
+            50% {
+                transform: translateX(0px);
+            }
+
+            100% {
+                transform: translateX(15px);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card-header span:first-child {
+            word-break: break-all;
+            font-weight: 800;
+            font-size: 15px;
+            line-height: 135%;
+            color: rgba(87, 77, 51, 0.66);
+        }
+
+        .card-header span:last-child {
+            font-weight: 700;
+            font-size: 15px;
+            line-height: 135%;
+            color: rgba(87, 77, 51, 0.33);
+        }
+
+        .temp {
+            position: absolute;
+            left: 25px;
+            bottom: 12px;
+            font-weight: 700;
+            font-size: 64px;
+            line-height: 77px;
+            color: rgba(87, 77, 51, 1);
+        }
+
+        .temp-scale {
+            width: 80px;
+            height: 36px;
+            position: absolute;
+            right: 25px;
+            bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 9px;
+        }
+
+        .temp-scale span {
+            font-weight: 700;
+            font-size: 13px;
+            line-height: 134.49%;
+            color: rgba(87, 77, 51, 0.66);
+        }
+
+        /* From Uiverse.io by Galahhad */
+        .theme-switch {
+            --toggle-size: 20px;
+            --container-width: 4.5em;
+            --container-height: 2em;
+            --container-radius: 5em;
+            --container-light-bg: #3D7EAE;
+            --container-night-bg: #1D1F2C;
+            --circle-container-diameter: 2.7em;
+            --sun-moon-diameter: 1.7em;
+            --sun-bg: #ECCA2F;
+            --moon-bg: #C4C9D1;
+            --spot-color: #959DB1;
+            --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+            --stars-color: #fff;
+            --clouds-color: #F3FDFF;
+            --back-clouds-color: #AACADF;
+            --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+        }
+
+        .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-size: var(--toggle-size);
+        }
+
+        .theme-switch__container {
+            width: var(--container-width);
+            height: var(--container-height);
+            background-color: var(--container-light-bg);
+            border-radius: var(--container-radius);
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__container::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            border-radius: var(--container-radius)
+        }
+
+        .theme-switch__checkbox {
+            display: none;
+        }
+
+        .theme-switch__circle-container {
+            width: var(--circle-container-diameter);
+            height: var(--circle-container-diameter);
+            background-color: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            left: var(--circle-container-offset);
+            top: var(--circle-container-offset);
+            border-radius: var(--container-radius);
+            box-shadow: inset 0 0 0 2.7em rgba(255, 255, 255, 0.1), inset 0 0 0 2.7em rgba(255, 255, 255, 0.1), 0 0 0 0.5em rgba(255, 255, 255, 0.1), 0 0 0 1em rgba(255, 255, 255, 0.1);
+            display: flex;
+            transition: var(--circle-transition);
+            pointer-events: none;
+        }
+
+        .theme-switch__sun-moon-container {
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+            width: var(--sun-moon-diameter);
+            height: var(--sun-moon-diameter);
+            margin: auto;
+            border-radius: var(--container-radius);
+            background-color: var(--sun-bg);
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .theme-switch__moon {
+            transform: translateX(100%);
+            width: 100%;
+            height: 100%;
+            background-color: var(--moon-bg);
+            border-radius: inherit;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__spot {
+            position: absolute;
+            top: 0.75em;
+            left: 0.312em;
+            width: 0.75em;
+            height: 0.75em;
+            border-radius: var(--container-radius);
+            background-color: var(--spot-color);
+            box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+        }
+
+        .theme-switch__spot:nth-of-type(2) {
+            width: 0.375em;
+            height: 0.375em;
+            top: 0.937em;
+            left: 1.375em;
+        }
+
+        .theme-switch__spot:nth-last-of-type(3) {
+            width: 0.25em;
+            height: 0.25em;
+            top: 0.312em;
+            left: 0.812em;
+        }
+
+        .theme-switch__clouds {
+            width: 1.25em;
+            height: 1.25em;
+            background-color: var(--clouds-color);
+            border-radius: var(--container-radius);
+            position: absolute;
+            bottom: -0.625em;
+            left: 0.312em;
+            box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+        }
+
+        .theme-switch__stars-container {
+            position: absolute;
+            color: var(--stars-color);
+            top: -100%;
+            left: 0.312em;
+            width: 2.75em;
+            height: auto;
+            transition: var(--transition);
+        }
+
+        /* actions */
+        .theme-switch__checkbox:checked + .theme-switch__container {
+            background-color: var(--container-night-bg);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+        }
+
+        .theme-switch__circle-container:hover {
+            left: calc(var(--circle-container-offset) + 0.187em);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em)
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+            transform: translate(0);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+            bottom: -4.062em;
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #4facfe, #00f2fe);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .main-container {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .box {
+            border: none;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .box:hover {
+            transform: scale(1.05);
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            border: 2px solid #4facfe;
+        }
+
+        .weather-icon img {
+            width: 100px;
+            height: auto;
+            transition: all 0.3s ease;
+        }
+
+        .info {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            text-align: left;
+        }
+
+        .info span {
+            display: inline-block;
+            margin-right: 5px;
+            font-size: 1.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        footer p {
+            margin: 5px;
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        footer a {
+            text-decoration: none;
+            color: #4facfe;
+        }
+
+        footer a:hover {
+            color: #00f2fe;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 600px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .box {
+                width: 90%;
+                padding: 20px;
+            }
+
+            .info {
+                font-size: 1rem;
+            }
+        }
+
+        /* Snow animation */
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            z-index: 9999;
+            user-select: none;
+            pointer-events: none;
+            color: white;
+            font-size: 1em;
+            will-change: transform;
+        }
+
+        @keyframes snowflakes-fall {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        @keyframes snowflakes-shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(80px);
+            }
+        }
+
+        .snowflake {
+            animation: snowflakes-fall 10s linear infinite, snowflakes-shake 3s ease-in-out infinite;
+        }
+
+        .snowflake:nth-of-type(0) {
+            left: 1%;
+            animation-delay: 0s, 0s;
+        }
+
+        .snowflake:nth-of-type(1) {
+            left: 10%;
+            animation-delay: 1s, 1s;
+        }
+
+        .snowflake:nth-of-type(2) {
+            left: 20%;
+            animation-delay: 6s, .5s;
+        }
+
+        .snowflake:nth-of-type(3) {
+            left: 30%;
+            animation-delay: 4s, 2s;
+        }
+
+        .snowflake:nth-of-type(4) {
+            left: 40%;
+            animation-delay: 2s, 2s;
+        }
+
+        .snowflake:nth-of-type(5) {
+            left: 50%;
+            animation-delay: 8s, 3s;
+        }
+
+        .snowflake:nth-of-type(6) {
+            left: 60%;
+            animation-delay: 6s, 2s;
+        }
+
+        .snowflake:nth-of-type(7) {
+            left: 70%;
+            animation-delay: 2.5s, 1s;
+        }
+
+        .snowflake:nth-of-type(8) {
+            left: 80%;
+            animation-delay: 1s, 0s;
+        }
+
+        .snowflake:nth-of-type(9) {
+            left: 90%;
+            animation-delay: 3s, 1.5s;
+        }
+
+        .snowflake:nth-of-type(10) {
+            left: 25%;
+            animation-delay: 2s, 0s;
+        }
+
+        .snowflake:nth-of-type(11) {
+            left: 65%;
+            animation-delay: 4s, 2.5s;
+        }
+
+        .snowflake:nth-of-type(12) {
+            left: 75%;
+            animation-delay: 1s, 1s;
+        }
+
+        .snowflake:nth-of-type(13) {
+            left: 85%;
+            animation-delay: 3s, 0s;
+        }
+
+        .snowflake:nth-of-type(14) {
+            left: 95%;
+            animation-delay: 5s, 1s;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌤️ Dự Báo Thời Tiết Việt Nam</h1>
+        <label class="theme-switch">
+            <input type="checkbox" class="theme-switch__checkbox">
+            <div class="theme-switch__container">
+                <div class="theme-switch__clouds"></div>
+                <div class="theme-switch__stars-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path>
+                    </svg>
+                </div>
+                <div class="theme-switch__circle-container">
+                    <div class="theme-switch__sun-moon-container">
+                        <div class="theme-switch__moon">
+                            <div class="theme-switch__spot"></div>
+                            <div class="theme-switch__spot"></div>
+                            <div class="theme-switch__spot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </label>
+    </header>
+
+    <main class="main-container">
+        <div class="box">
+            <h2>Thông Tin Thời Tiết</h2>
+            <p>Chọn thành phố bên dưới:</p>
+            <select id="citySelect">
+                <option value="Hà Giang">Hà Giang</option>
+                <option value="Cao Bằng">Cao Bằng</option>
+                <option value="Lào Cai">Lào Cai</option>
+                <option value="Sơn La">Sơn La</option>
+                <option value="Lai Châu">Lai Châu</option>
+                <option value="Bắc Kạn">Bắc Kạn</option>
+                <option value="Lạng Sơn">Lạng Sơn</option>
+                <option value="Tuyên Quang">Tuyên Quang</option>
+                <option value="Yên Bái">Yên Bái</option>
+                <option value="Thái Nguyên">Thái Nguyên</option>
+                <option value="Điện Biên">Điện Biên</option>
+                <option value="Phú Thọ">Phú Thọ</option>
+                <option value="Vĩnh Phúc">Vĩnh Phúc</option>
+                <option value="Bắc Giang">Bắc Giang</option>
+                <option value="Bắc Ninh">Bắc Ninh</option>
+                <option value="Hà Nội">Hà Nội</option>
+                <option value="Quảng Ninh">Quảng Ninh</option>
+                <option value="Hải Dương">Hải Dương</option>
+                <option value="Hải Phòng">Hải Phòng</option>
+                <option value="Hòa Bình">Hòa Bình</option>
+                <option value="Thái Bình">Thái Bình</option>
+                <option value="Hà Nam">Hà Nam</option>
+                <option value="Nam Định">Nam Định</option>
+                <option value="Ninh Bình">Ninh Bình</option>
+                <option value="Thanh Hóa">Thanh Hóa</option>
+                <option value="Nghệ An">Nghệ An</option>
+                <option value="Hà Tĩnh">Hà Tĩnh</option>
+                <option value="Quảng Bình">Quảng Bình</option>
+                <option value="Quảng Trị">Quảng Trị</option>
+                <option value="Thừa Thiên-Huế">Thừa Thiên-Huế</option>
+                <option value="Đà Nẵng">Đà Nẵng</option>
+                <option value="Quảng Nam">Quảng Nam</option>
+                <option value="Quảng Ngãi">Quảng Ngãi</option>
+                <option value="Bình Định">Bình Định</option>
+                <option value="Phú Yên">Phú Yên</option>
+                <option value="Khánh Hòa">Khánh Hòa</option>
+                <option value="Ninh Thuận">Ninh Thuận</option>
+                <option value="Bình Thuận">Bình Thuận</option>
+                <option value="Kon Tum">Kon Tum</option>
+                <option value="Gia Lai">Gia Lai</option>
+                <option value="Đắk Lắk">Đắk Lắk</option>
+                <option value="Đắk Nông">Đắk Nông</option>
+                <option value="Lâm Đồng">Lâm Đồng</option>
+                <option value="Bình Phước">Bình Phước</option>
+                <option value="Tây Ninh">Tây Ninh</option>
+                <option value="Bà Rịa-Vũng Tàu">Bà Rịa-Vũng Tàu</option>
+                <option value="TP.HCM">TP.HCM</option>
+                <option value="Long An">Long An</option>
+                <option value="Tiền Giang">Tiền Giang</option>
+                <option value="Bến Tre">Bến Tre</option>
+                <option value="Trà Vinh">Trà Vinh</option>
+                <option value="Vĩnh Long">Vĩnh Long</option>
+                <option value="Đồng Tháp">Đồng Tháp</option>
+                <option value="An Giang">An Giang</option>
+                <option value="Kiên Giang">Kiên Giang</option>
+                <option value="Cần Thơ">Cần Thơ</option>
+                <option value="Hậu Giang">Hậu Giang</option>
+                <option value="Sóc Trăng">Sóc Trăng</option>
+                <option value="Bạc Liêu">Bạc Liêu</option>
+                <option value="Cà Mau">Cà Mau</option>
+            </select>
+            
+            <div id="weatherData">
+                <p id="locationName" class="info"></p>
+                <p id="temperature" class="info"></p>
+                <div id="weatherIcon" class="weather-icon"></div>
+                <p id="rainChance" class="info"></p>
+                <p id="humidity" class="info"></p>
+                <p id="windSpeed" class="info"></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Nguyễn Văn. Tất cả các quyền được bảo lưu.</p>
+        <p>&hearts;❤️Chúc bạn một ngày tốt lành❤️&hearts;</p>
+        <p>
+            <a href="https://www.facebook.com/profile.php?id=100073017864297" target="_blank">
+                <i class="fab fa-facebook"></i> Kết nối Facebook
+            </a>
+        </p>
+    </footer>
+
+    <script>
+        const apiKey = '8fd66b221e46464492e45800242211';  // API Key của bạn
+        const citySelect = document.getElementById('citySelect');
+        const temperatureDisplay = document.getElementById('temperature');
+        const rainChanceDisplay = document.getElementById('rainChance');
+        const humidityDisplay = document.getElementById('humidity');
+        const windSpeedDisplay = document.getElementById('windSpeed');
+        const locationNameDisplay = document.getElementById('locationName');
+        const weatherIconDisplay = document.getElementById('weatherIcon');
+
+        citySelect.addEventListener('change', updateWeather);
+
+        function updateWeather() {
+            const cityName = citySelect.value;
+            temperatureDisplay.textContent = 'Đang tải...';
+            rainChanceDisplay.textContent = '';
+            humidityDisplay.textContent = '';
+            windSpeedDisplay.textContent = '';
+            weatherIconDisplay.innerHTML = '';
+            
+            fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${cityName}&lang=vi`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error('Không thể lấy dữ liệu cho thành phố này.');
+                    }
+                    const temperature = data.current.temp_c;
+                    const weatherCondition = data.current.condition.text;
+                    const weatherIcon = data.current.condition.icon;
+                    const humidity = data.current.humidity;
+                    const windSpeed = data.current.wind_kph;
+
+                    locationNameDisplay.textContent = `📍 Thành phố: ${cityName}`;
+                    temperatureDisplay.textContent = `🌡️ Nhiệt độ: ${temperature}°C`;
+                    rainChanceDisplay.textContent = `☁️ Thời tiết: ${weatherCondition}`;
+                    humidityDisplay.textContent = `💧 Độ ẩm: ${humidity}%`;
+                    windSpeedDisplay.textContent = `💨 Gió: ${windSpeed} km/h`;
+                    weatherIconDisplay.innerHTML = `<img src="https:${weatherIcon}" alt="weather icon">`;
+                })
+                .catch(error => {
+                    console.error('Lỗi lấy dữ liệu:', error);
+                    temperatureDisplay.textContent = 'Không thể tải dữ liệu thời tiết.';
+                    rainChanceDisplay.textContent = '';
+                    humidityDisplay.textContent = '';
+                    windSpeedDisplay.textContent = '';
+                    weatherIconDisplay.innerHTML = '';
+                });
+        }
+
+        window.onload = () => citySelect.dispatchEvent(new Event('change'));
+
+        // Snow animation
+        const snowflakes = document.createElement('div');
+        snowflakes.classList.add('snowflakes');
+        snowflakes.setAttribute('aria-hidden', 'true');
+        for (let i = 0; i < 15; i++) {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.textContent = '❅';
+            snowflakes.appendChild(snowflake);
+        }
+        document.body.appendChild(snowflakes);
+    </script>
+</body>
+</html>
