@@ -1,0 +1,325 @@
+    body {
+        font-family: 'Inter', system-ui, sans-serif;
+        background: #0a0a0a;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        margin: 0;
+        padding: 20px;
+        color-scheme: dark;
+    }
+
+    .weather-container {
+        background: linear-gradient(145deg, #151515, #202020);
+        padding: 2rem; /* Giảm padding để tăng không gian hiển thị */
+        border-radius: 24px;
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(255, 255, 255, 0.05);
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        box-sizing: border-box; /* Thêm để đảm bảo container không vượt kích thước */
+    }
+
+    .weather-container::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(600px circle at var(--x) var(--y), 
+            rgba(255, 255, 255, 0.1),
+            transparent 40%);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .weather-container:hover::before {
+        opacity: 0.6;
+    }
+
+    h1 {
+        color: #f5f5f5;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        font-size: 2.1rem;
+        letter-spacing: -0.03em;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    input {
+        width: 100%;
+        padding: 1.1rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        margin: 1rem 0;
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        box-sizing: border-box; /* Quan trọng: Ngăn input tràn khung */
+    }
+
+    input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 300;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 
+            0 0 0 4px rgba(255, 255, 255, 0.1),
+            inset 0 0 12px rgba(255, 255, 255, 0.05);
+    }
+
+    button {
+        width: 100%;
+        padding: 1.1rem;
+        background: linear-gradient(45deg, 
+            rgba(255, 255, 255, 0.12), 
+            rgba(255, 255, 255, 0.08));
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        backdrop-filter: blur(8px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    button::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(45deg,
+            transparent,
+            rgba(255, 255, 255, 0.15),
+            transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+
+    button:hover::after {
+        transform: translateX(100%);
+    }
+
+    button:hover {
+        background: linear-gradient(45deg,
+            rgba(255, 255, 255, 0.15),
+            rgba(255, 255, 255, 0.12));
+        transform: translateY(-2px);
+    }
+
+    #city-name {
+        color: #ffffff;
+        font-size: 1.9rem;
+        margin: 1.5rem 0;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+    }
+
+    #temperature {
+        font-size: 1.5rem;
+        font-weight: 300;
+        margin: 1rem 0;
+        background: linear-gradient(45deg, #ffffff, #bdbbbb);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 2px 8px rgba(147, 159, 168, 0.2);
+        font-weight: 635;
+    }
+
+    #weather-description {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        letter-spacing: 0.03em;
+    }
+
+    .weather-icon {
+        width: 150px;  /* Tăng từ 125px */
+        height: 155px; /* Tăng từ 130px */
+        margin: 2rem 0;
+        filter: 
+            drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3))
+            brightness(1.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .weather-icon:hover {
+        transform: scale(1.08) rotate(8deg); /* Tăng hiệu ứng phóng to */
+        filter: 
+            drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4))
+            brightness(1.15);
+    }
+
+    .weather-container {
+        padding: 2.5rem 2rem; /* Điều chỉnh padding dọc */
+    }
+
+    #weather-description {
+        margin-bottom: 1.5rem; /* Giảm khoảng cách dưới mô tả */
+    }
+
+    .details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .detail-item span:first-child {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.96rem;
+        display: block;
+        margin-bottom: 0.4rem;
+    }
+
+    .detail-item span:last-child {
+        color: #a0d8ff;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+
+    .error-message {
+        color: #ff8080;
+        font-size: 1rem;
+        padding: 1rem;
+        background: rgba(255, 128, 128, 0.1);
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        animation: errorPulse 1.8s infinite;
+    }
+
+    @keyframes errorPulse {
+        0%, 100% { opacity: 0.95; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(0.98); }
+    }
+
+    .hidden {
+        opacity: 0;
+        height: 0;
+        pointer-events: none;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Hiệu ứng ánh sáng động theo chuột */
+    .weather-container {
+        --x: 50%;
+        --y: 50%;
+    }
+
+    .weather-container:hover {
+        transform: perspective(1000px) rotateX(2deg) rotateY(2deg);
+    }
+
+    @media (max-width: 480px) {
+        .weather-container {
+            padding: 1.5rem; /* Giảm padding thêm trên mobile */
+        }
+        
+        input {
+            padding: 1rem; /* Điều chỉnh cho màn hình nhỏ */
+        }
+    }
+
+    
+    /* ---------- Nút chuyển đổi ---------- */
+.switch {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    --width-of-switch: 3.5em;
+    --height-of-switch: 2em;
+    --size-of-icon: 1.4em;
+    --slider-offset: 0.3em;
+    width: var(--width-of-switch);
+    height: var(--height-of-switch);
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #303136; /* Màu nền tối mặc định */
+    transition: .4s;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: var(--size-of-icon);
+    width: var(--size-of-icon);
+    border-radius: 20px;
+    left: var(--slider-offset);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #303136;
+    box-shadow: 
+      inset -3px -2px 5px -2px #8983f7,
+      inset -10px -4px 0 0 #a3dafb;
+    transition: .4s;
+  }
+  
+  /* Khi bật sang phải (chế độ sáng) */
+  input:checked + .slider {
+    background-color: #f0f0f0;
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  input:checked + .slider:before {
+    left: calc(100% - (var(--size-of-icon) + var(--slider-offset)));
+    background: linear-gradient(40deg, #ffd700, #ff8c00);
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.2);
+    transform: translateY(-50%);
+  }
+  
+  /* ---------- Chế độ màu ---------- */
+  /* Mặc định: Tối */
+  body {
+    background: #0a0a0a;
+    color: #fff;
+  }
+  
+  /* Chế độ sáng */
+  body.light-mode {
+    background: #f8f9fa;
+    color: #2c3e50;
+  }
+  
+  /* Container */
+  .weather-container {
+    background: linear-gradient(145deg, #151515, #202020);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  body.light-mode .weather-container {
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Các thành phần khác */
+  body.light-mode #temperature {
+    background: linear-gradient(45deg, #2c3e50, #34495e);
+  }
+  
+  body.light-mode button {
+    background: linear-gradient(45deg, 
+      rgba(0, 0, 0, 0.05), 
+      rgba(0, 0, 0, 0.08));
+  }
