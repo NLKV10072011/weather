@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dự báo thời tiết</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        body.light-mode::before {
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
+        }
+    </style>
 </head>
 <body>
     <div class="weather-container">
@@ -13,15 +36,106 @@
             <span class="slider"></span>
         </label>
         <h1><center>Dự báo thời tiết</center></h1>
-        <input type="text" id="city-input" placeholder="Nhập thành phố...">
-        <button onclick="getWeather()">Xem thời tiết</button>
-        <div id="weather-info" class="hidden">
-            <center><h2 id="city-name"></h2></center>
-            <center><p id="temperature"></p></center>
-            <center><p id="weather-description"></p></center>
-            <center><img id="weather-icon" src="" alt="" class="weather-icon"></center>
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="city-input" placeholder="Nhập thành phố...">
+                <div id="suggestions" class="suggestions hidden"></div>
+            </div>
+            <button onclick="getWeather()"><i class="fas fa-search"></i></button>
         </div>
+        <div class="recent-searches">
+            <h4>Tìm kiếm gần đây</h4>
+            <div id="recent-cities" class="recent-cities"></div>
+        </div>
+        <div id="weather-info" class="hidden">
+            <div class="current-weather">
+                <div class="time-info">
+                    <span id="local-time"></span>
+                    <span id="date"></span>
+                </div>
+                <center><h2 id="city-name"></h2></center>
+                <center><p id="temperature"></p></center>
+                <center><p id="weather-description"></p></center>
+                <center><img id="weather-icon" src="" alt="" class="weather-icon"></center>
+                <div class="details">
+                    <div class="detail-item">
+                        <span>Độ ẩm</span>
+                        <span id="humidity"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Tốc độ gió</span>
+                        <span id="wind-speed"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Áp suất</span>
+                        <span id="pressure"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Cảm giác như</span>
+                        <span id="feels-like"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Mặt trời mọc</span>
+                        <span id="sunrise"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Mặt trời lặn</span>
+                        <span id="sunset"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Chỉ số UV</span>
+                        <span id="uv-index"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Tầm nhìn</span>
+                        <span id="visibility"></span>
+                    </div>
+                </div>
+                <div class="air-quality">
+                    <h3>Chất lượng không khí</h3>
+                    <div class="air-quality-info">
+                        <div class="air-quality-index">
+                            <span id="aqi-value"></span>
+                            <span id="aqi-level"></span>
+                        </div>
+                        <div class="air-quality-details">
+                            <div class="pollutant">
+                                <span>PM2.5</span>
+                                <span id="pm25"></span>
+                            </div>
+                            <div class="pollutant">
+                                <span>PM10</span>
+                                <span id="pm10"></span>
+                            </div>
+                            <div class="pollutant">
+                                <span>NO2</span>
+                                <span id="no2"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="weather-map">
+                    <h3>Bản đồ thời tiết</h3>
+                    <div id="map"></div>
+                </div>
+                <div class="temperature-chart">
+                    <h3>Biểu đồ nhiệt độ</h3>
+                    <canvas id="tempChart"></canvas>
+                </div>
+                <div class="weather-alerts">
+                    <h3>Cảnh báo thời tiết</h3>
+                    <div id="alerts"></div>
+                </div>
+            </div>
+            <div class="forecast-container">
+                <h3>Dự báo 5 ngày</h3>
+                <div id="forecast" class="forecast"></div>
+            </div>
+        </div>
+        <div id="error-message" class="error-message hidden"></div>
     </div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html> 
