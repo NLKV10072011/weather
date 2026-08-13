@@ -3,41 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dự báo thời tiết</title>
+    <meta name="theme-color" content="#0B1220">
+    <title>Trạm thời tiết</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
 <body>
-    <div class="weather-container">
-        <label class="switch" aria-label="Chuyển chế độ sáng / tối">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider"></span>
-        </label>
+    <div class="app">
 
-        <h1><center>Dự báo thời tiết</center></h1>
+        <header class="topbar">
+            <div class="brand">
+                <i class="fa-solid fa-cloud-sun brand-icon"></i>
+                <span>Trạm thời tiết</span>
+            </div>
+            <div class="topbar-controls">
+                <div class="unit-toggle" role="group" aria-label="Đơn vị nhiệt độ">
+                    <button id="unit-c" type="button" class="unit-btn" onclick="setUnit('metric')">°C</button>
+                    <button id="unit-f" type="button" class="unit-btn" onclick="setUnit('imperial')">°F</button>
+                </div>
+                <label class="switch" aria-label="Chuyển chế độ sáng / tối">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"><i class="fa-solid fa-sun icon-sun"></i><i class="fa-solid fa-moon icon-moon"></i></span>
+                </label>
+            </div>
+        </header>
 
         <div class="search-container">
             <div class="search-wrapper">
-                <input type="text" id="city-input" placeholder="Nhập thành phố..." aria-label="Tên thành phố" autocomplete="off">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="city-input" placeholder="Nhập tên thành phố..." aria-label="Tên thành phố" autocomplete="off">
                 <div id="suggestions" class="suggestions hidden"></div>
             </div>
             <button id="search-btn" type="button" onclick="getWeather()" aria-label="Tìm kiếm">
                 <i class="fas fa-search"></i>
+                <span class="btn-label">Tìm</span>
             </button>
             <button id="geo-btn" type="button" onclick="getWeatherByLocation()" aria-label="Dùng vị trí hiện tại">
                 <i class="fas fa-location-crosshairs"></i>
+                <span class="btn-label">Vị trí</span>
             </button>
         </div>
 
-        <div class="unit-toggle" role="group" aria-label="Đơn vị nhiệt độ">
-            <button id="unit-c" type="button" class="unit-btn" onclick="setUnit('metric')">°C</button>
-            <button id="unit-f" type="button" class="unit-btn" onclick="setUnit('imperial')">°F</button>
+        <div class="chip-section hidden" id="favorites-section">
+            <h4><i class="fa-solid fa-star"></i> Yêu thích</h4>
+            <div id="favorite-cities" class="chip-row"></div>
         </div>
 
-        <div class="recent-searches hidden" id="recent-searches-section">
-            <h4>Tìm kiếm gần đây</h4>
-            <div id="recent-cities" class="recent-cities"></div>
+        <div class="chip-section hidden" id="recent-searches-section">
+            <h4><i class="fa-solid fa-clock-rotate-left"></i> Tìm kiếm gần đây</h4>
+            <div id="recent-cities" class="chip-row"></div>
         </div>
 
         <div id="loading" class="loading hidden">
@@ -45,89 +63,118 @@
             <span>Đang tải dữ liệu...</span>
         </div>
 
-        <div id="weather-info" class="hidden">
-            <div class="current-weather">
-                <div class="time-info">
-                    <span id="local-time"></span>
-                    <span id="date"></span>
-                </div>
-                <center><h2 id="city-name"></h2></center>
-                <center><p id="temperature"></p></center>
-                <center><p id="weather-description"></p></center>
-                <center><img id="weather-icon" src="" alt="" class="weather-icon"></center>
-                <div class="details">
-                    <div class="detail-item">
-                        <span>Độ ẩm</span>
-                        <span id="humidity"></span>
-                    </div>
-                    <div class="detail-item">
-                        <span>Tốc độ gió</span>
-                        <span id="wind-speed"></span>
-                    </div>
-                    <div class="detail-item">
-                        <span>Áp suất</span>
-                        <span id="pressure"></span>
-                    </div>
-                    <div class="detail-item">
-                        <span>Cảm giác như</span>
-                        <span id="feels-like"></span>
-                    </div>
-                    <div class="detail-item">
-                        <span>Mặt trời mọc</span>
-                        <span id="sunrise"></span>
-                    </div>
-                    <div class="detail-item">
-                        <span>Mặt trời lặn</span>
-                        <span id="sunset"></span>
-                    </div>
-                    <div class="detail-item" id="uv-item">
-                        <span>Chỉ số UV</span>
-                        <span id="uv-index">--</span>
-                    </div>
-                    <div class="detail-item">
-                        <span>Tầm nhìn</span>
-                        <span id="visibility"></span>
-                    </div>
-                </div>
-                <div class="air-quality">
-                    <h3>Chất lượng không khí</h3>
-                    <div class="air-quality-info">
-                        <div class="air-quality-index">
-                            <span id="aqi-value"></span>
-                            <span id="aqi-level"></span>
-                        </div>
-                        <div class="air-quality-details">
-                            <div class="pollutant">
-                                <span>PM2.5</span>
-                                <span id="pm25"></span>
-                            </div>
-                            <div class="pollutant">
-                                <span>PM10</span>
-                                <span id="pm10"></span>
-                            </div>
-                            <div class="pollutant">
-                                <span>NO2</span>
-                                <span id="no2"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="weather-map">
-                    <h3>Bản đồ thời tiết</h3>
-                    <div id="map"></div>
-                </div>
-                <div class="temperature-chart">
-                    <h3>Biểu đồ nhiệt độ</h3>
-                    <canvas id="tempChart"></canvas>
-                </div>
-            </div>
-            <div class="forecast-container">
-                <h3>Dự báo 5 ngày</h3>
-                <div id="forecast" class="forecast"></div>
-            </div>
-        </div>
-
         <div id="error-message" class="error-message hidden" role="alert"></div>
+
+        <main id="weather-info" class="weather-grid hidden">
+
+            <section class="panel now-card">
+                <div class="now-head">
+                    <div>
+                        <h2 id="city-name"></h2>
+                        <p class="updated-row">
+                            <span id="updated-at"></span>
+                            <button id="refresh-btn" type="button" class="icon-btn" onclick="manualRefresh()" aria-label="Làm mới">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </button>
+                        </p>
+                    </div>
+                    <div class="now-head-actions">
+                        <button id="favorite-btn" type="button" class="icon-btn" onclick="toggleFavoriteCurrent()" aria-label="Đánh dấu yêu thích">
+                            <i class="fa-regular fa-star"></i>
+                        </button>
+                        <button id="share-btn" type="button" class="icon-btn" onclick="shareWeather()" aria-label="Chia sẻ">
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="now-body">
+                    <img id="weather-icon" src="" alt="" class="weather-icon">
+                    <div class="now-readout">
+                        <p id="temperature" class="temperature"></p>
+                        <p id="weather-description" class="description"></p>
+                        <p id="feels-like-inline" class="feels-like-inline"></p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel instrument-strip" aria-label="Chi tiết thời tiết">
+                <div class="gauge">
+                    <span class="gauge-label">Độ ẩm</span>
+                    <span class="gauge-value" id="humidity"></span>
+                </div>
+                <div class="gauge">
+                    <span class="gauge-label">Gió</span>
+                    <span class="gauge-value" id="wind-speed"></span>
+                    <span class="gauge-sub">
+                        <svg id="wind-arrow" class="wind-arrow" viewBox="0 0 24 24" width="14" height="14"><path d="M12 2 L18 14 L12 10.5 L6 14 Z" fill="currentColor"/></svg>
+                        <span id="wind-direction"></span>
+                    </span>
+                </div>
+                <div class="gauge">
+                    <span class="gauge-label">Áp suất</span>
+                    <span class="gauge-value" id="pressure"></span>
+                </div>
+                <div class="gauge">
+                    <span class="gauge-label">Tầm nhìn</span>
+                    <span class="gauge-value" id="visibility"></span>
+                </div>
+                <div class="gauge">
+                    <span class="gauge-label">Mặt trời mọc</span>
+                    <span class="gauge-value" id="sunrise"></span>
+                </div>
+                <div class="gauge">
+                    <span class="gauge-label">Mặt trời lặn</span>
+                    <span class="gauge-value" id="sunset"></span>
+                </div>
+            </section>
+
+            <section class="panel forecast-panel">
+                <div class="tabs" role="tablist">
+                    <button type="button" class="tab active" id="tab-hourly" role="tab" aria-selected="true" onclick="switchForecastTab('hourly')">Hôm nay</button>
+                    <button type="button" class="tab" id="tab-daily" role="tab" aria-selected="false" onclick="switchForecastTab('daily')">5 ngày tới</button>
+                </div>
+                <div id="hourly-forecast" class="forecast-scroll"></div>
+                <div id="forecast" class="forecast-scroll hidden"></div>
+            </section>
+
+            <section class="panel uv-panel">
+                <h3>Chỉ số UV</h3>
+                <div class="uv-readout">
+                    <span id="uv-index" class="uv-number">--</span>
+                    <div class="uv-bar"><div id="uv-bar-fill" class="uv-bar-fill"></div></div>
+                    <span id="uv-label" class="uv-label"></span>
+                </div>
+            </section>
+
+            <section class="panel air-quality">
+                <h3>Chất lượng không khí</h3>
+                <div class="air-quality-info">
+                    <div class="air-quality-index">
+                        <span id="aqi-value"></span>
+                        <span id="aqi-level"></span>
+                    </div>
+                    <div class="air-quality-details">
+                        <div class="pollutant"><span>PM2.5</span><span id="pm25"></span></div>
+                        <div class="pollutant"><span>PM10</span><span id="pm10"></span></div>
+                        <div class="pollutant"><span>NO2</span><span id="no2"></span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel weather-map">
+                <h3>Bản đồ thời tiết</h3>
+                <div id="map"></div>
+            </section>
+
+            <section class="panel temperature-chart">
+                <h3>Biểu đồ nhiệt độ</h3>
+                <canvas id="tempChart"></canvas>
+            </section>
+
+        </main>
+
+        <div id="toast" class="toast hidden"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
