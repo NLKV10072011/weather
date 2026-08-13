@@ -7,46 +7,44 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <style>
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        body.light-mode::before {
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
-        }
-    </style>
 </head>
 <body>
     <div class="weather-container">
-        <label class="switch">
-            <input type="checkbox">
+        <label class="switch" aria-label="Chuyển chế độ sáng / tối">
+            <input type="checkbox" id="theme-toggle">
             <span class="slider"></span>
         </label>
+
         <h1><center>Dự báo thời tiết</center></h1>
+
         <div class="search-container">
             <div class="search-wrapper">
-                <input type="text" id="city-input" placeholder="Nhập thành phố...">
+                <input type="text" id="city-input" placeholder="Nhập thành phố..." aria-label="Tên thành phố" autocomplete="off">
                 <div id="suggestions" class="suggestions hidden"></div>
             </div>
-            <button onclick="getWeather()"><i class="fas fa-search"></i></button>
+            <button id="search-btn" type="button" onclick="getWeather()" aria-label="Tìm kiếm">
+                <i class="fas fa-search"></i>
+            </button>
+            <button id="geo-btn" type="button" onclick="getWeatherByLocation()" aria-label="Dùng vị trí hiện tại">
+                <i class="fas fa-location-crosshairs"></i>
+            </button>
         </div>
-        <div class="recent-searches">
+
+        <div class="unit-toggle" role="group" aria-label="Đơn vị nhiệt độ">
+            <button id="unit-c" type="button" class="unit-btn" onclick="setUnit('metric')">°C</button>
+            <button id="unit-f" type="button" class="unit-btn" onclick="setUnit('imperial')">°F</button>
+        </div>
+
+        <div class="recent-searches hidden" id="recent-searches-section">
             <h4>Tìm kiếm gần đây</h4>
             <div id="recent-cities" class="recent-cities"></div>
         </div>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <span>Đang tải dữ liệu...</span>
+        </div>
+
         <div id="weather-info" class="hidden">
             <div class="current-weather">
                 <div class="time-info">
@@ -82,9 +80,9 @@
                         <span>Mặt trời lặn</span>
                         <span id="sunset"></span>
                     </div>
-                    <div class="detail-item">
+                    <div class="detail-item" id="uv-item">
                         <span>Chỉ số UV</span>
-                        <span id="uv-index"></span>
+                        <span id="uv-index">--</span>
                     </div>
                     <div class="detail-item">
                         <span>Tầm nhìn</span>
@@ -122,20 +120,18 @@
                     <h3>Biểu đồ nhiệt độ</h3>
                     <canvas id="tempChart"></canvas>
                 </div>
-                <div class="weather-alerts">
-                    <h3>Cảnh báo thời tiết</h3>
-                    <div id="alerts"></div>
-                </div>
             </div>
             <div class="forecast-container">
                 <h3>Dự báo 5 ngày</h3>
                 <div id="forecast" class="forecast"></div>
             </div>
         </div>
-        <div id="error-message" class="error-message hidden"></div>
+
+        <div id="error-message" class="error-message hidden" role="alert"></div>
     </div>
+
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
-</html> 
+</html>
