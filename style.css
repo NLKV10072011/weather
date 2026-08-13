@@ -9,31 +9,28 @@ body {
     color-scheme: dark;
     position: relative;
     overflow-x: hidden;
-    background-image: 
+    background-image:
         radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
     background-attachment: fixed;
+    color: #fff;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
+body.light-mode {
+    background: #f8f9fa;
+    color: #2c3e50;
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
 }
 
 .weather-container {
+    --x: 50%;
+    --y: 50%;
     background: linear-gradient(145deg, #151515, #202020);
-    padding: 2.5rem;
+    padding: 2.5rem 2rem;
     border-radius: 24px;
-    box-shadow: 
+    box-shadow:
         0 12px 40px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(255, 255, 255, 0.05);
     width: 100%;
@@ -51,9 +48,7 @@ body::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(600px circle at var(--x) var(--y), 
-        rgba(255, 255, 255, 0.1),
-        transparent 40%);
+    background: radial-gradient(600px circle at var(--x) var(--y), rgba(255, 255, 255, 0.1), transparent 40%);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s ease;
@@ -61,6 +56,18 @@ body::before {
 
 .weather-container:hover::before {
     opacity: 0.6;
+}
+
+.weather-container:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(2deg);
+}
+
+body.light-mode .weather-container {
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 h1 {
@@ -86,16 +93,29 @@ h1::after {
     border-radius: 2px;
 }
 
+body.light-mode h1 {
+    color: #2c3e50;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode h1::after {
+    background: linear-gradient(90deg, transparent, #2c3e50, transparent);
+}
+
+/* ---------- Tìm kiếm ---------- */
+
 .search-container {
     display: flex;
     gap: 10px;
     margin: 1rem 0;
     position: relative;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .search-wrapper {
     flex: 1;
+    min-width: 140px;
     position: relative;
 }
 
@@ -121,17 +141,25 @@ input::placeholder {
 input:focus {
     outline: none;
     border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 
+    box-shadow:
         0 0 0 4px rgba(255, 255, 255, 0.1),
         inset 0 0 12px rgba(255, 255, 255, 0.05);
     transform: translateY(-2px);
 }
 
+body.light-mode input {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #2c3e50;
+}
+
+body.light-mode input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
 button {
     padding: 1.1rem 1.5rem;
-    background: linear-gradient(45deg, 
-        rgba(255, 255, 255, 0.12), 
-        rgba(255, 255, 255, 0.08));
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08));
     color: white;
     border: none;
     border-radius: 14px;
@@ -147,9 +175,239 @@ button {
 button:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(45deg, 
-        rgba(255, 255, 255, 0.15), 
-        rgba(255, 255, 255, 0.1));
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+body.light-mode button {
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.08));
+    color: #2c3e50;
+}
+
+body.light-mode button:hover {
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.12));
+}
+
+.search-container button {
+    width: auto;
+    padding: 0 1.3rem;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-container button i {
+    font-size: 1.2rem;
+}
+
+/* ---------- Đơn vị nhiệt độ ---------- */
+
+.unit-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.75rem 0 1.25rem;
+    justify-content: center;
+}
+
+.unit-btn {
+    padding: 0.45rem 1.1rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.unit-btn.active {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.1));
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.light-mode .unit-btn {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.55);
+}
+
+body.light-mode .unit-btn.active {
+    background: rgba(0, 0, 0, 0.08);
+    color: #2c3e50;
+}
+
+/* ---------- Gợi ý tự động ---------- */
+
+.suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(20, 20, 20, 0.95);
+    border-radius: 12px;
+    margin-top: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* ---------- Tìm kiếm gần đây ---------- */
+
+.recent-searches {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.recent-searches h4 {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+}
+
+.recent-cities {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.recent-city {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.recent-city:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: none;
+    box-shadow: none;
+}
+
+body.light-mode .recent-searches {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .recent-searches h4 {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode .recent-city {
+    background: rgba(0, 0, 0, 0.03);
+    color: inherit;
+}
+
+body.light-mode .recent-city:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* ---------- Trạng thái tải ---------- */
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem 0;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #a0d8ff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+body.light-mode .loading {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode .spinner {
+    border-color: rgba(0, 0, 0, 0.1);
+    border-top-color: #2980b9;
+}
+
+/* ---------- Thời tiết hiện tại ---------- */
+
+.current-weather {
+    margin-bottom: 2rem;
+}
+
+#city-name {
+    color: #ffffff;
+    font-size: 1.9rem;
+    margin: 1.5rem 0;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+
+#temperature {
+    font-size: 1.5rem;
+    font-weight: 635;
+    margin: 1rem 0;
+    background: linear-gradient(45deg, #ffffff, #bdbbbb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 2px 8px rgba(147, 159, 168, 0.2);
+}
+
+body.light-mode #temperature {
+    background: linear-gradient(45deg, #2c3e50, #34495e);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+#weather-description {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.03em;
 }
 
 .weather-icon {
@@ -157,9 +415,7 @@ button:hover {
     height: 155px;
     margin: 2rem auto;
     display: block;
-    filter: 
-        drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))
-        brightness(1.05);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)) brightness(1.05);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     animation: float 6s ease-in-out infinite;
     opacity: 0.95;
@@ -218,55 +474,6 @@ button:hover {
     font-weight: 500;
 }
 
-/* Chế độ sáng */
-body.light-mode {
-    background: #f8f9fa;
-    color: #2c3e50;
-    background-image: 
-        radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
-}
-
-body.light-mode .weather-container {
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 
-        0 12px 40px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode h1 {
-    color: #2c3e50;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-body.light-mode h1::after {
-    background: linear-gradient(90deg, transparent, #2c3e50, transparent);
-}
-
-body.light-mode input {
-    background: rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: #2c3e50;
-}
-
-body.light-mode input::placeholder {
-    color: rgba(0, 0, 0, 0.4);
-}
-
-body.light-mode button {
-    background: linear-gradient(45deg, 
-        rgba(0, 0, 0, 0.05), 
-        rgba(0, 0, 0, 0.08));
-    color: #2c3e50;
-}
-
-body.light-mode button:hover {
-    background: linear-gradient(45deg, 
-        rgba(0, 0, 0, 0.08), 
-        rgba(0, 0, 0, 0.12));
-}
-
 body.light-mode .details {
     background: rgba(0, 0, 0, 0.02);
     border: 1px solid rgba(0, 0, 0, 0.05);
@@ -284,211 +491,102 @@ body.light-mode .detail-item span:last-child {
     color: #2980b9;
 }
 
-@media (max-width: 480px) {
-    .weather-container {
-        padding: 1.5rem;
-        margin: 1rem;
-    }
-    
-    input {
-        padding: 1rem;
-        font-size: 1rem;
-    }
-    
-    .weather-icon {
-        width: 120px;
-        height: 125px;
-    }
-    
-    .details {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    button {
-        padding: 1rem 1.2rem;
-    }
-}
-
-#city-name {
-    color: #ffffff;
-    font-size: 1.9rem;
-    margin: 1.5rem 0;
-    font-weight: 650;
-    letter-spacing: -0.02em;
-}
-
-#temperature {
-    font-size: 1.5rem;
-    font-weight: 300;
-    margin: 1rem 0;
-    background: linear-gradient(45deg, #ffffff, #bdbbbb);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 2px 8px rgba(147, 159, 168, 0.2);
-    font-weight: 635;
-}
-
-#weather-description {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1.3rem;
-    margin-bottom: 2rem;
-    letter-spacing: 0.03em;
-}
-
-.weather-container {
-    padding: 2.5rem 2rem; /* Điều chỉnh padding dọc */
-}
-
-#weather-description {
-    margin-bottom: 1.5rem; /* Giảm khoảng cách dưới mô tả */
-}
-
-.error-message {
-    color: #ff8080;
-    font-size: 1rem;
-    padding: 1rem;
-    background: rgba(255, 128, 128, 0.1);
-    border-radius: 12px;
-    margin: 1.5rem 0;
-    animation: errorPulse 1.8s infinite;
-}
-
-@keyframes errorPulse {
-    0%, 100% { opacity: 0.95; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.98); }
-}
-
-.hidden {
-    opacity: 0;
-    height: 0;
-    pointer-events: none;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Hiệu ứng ánh sáng động theo chuột */
-.weather-container {
-    --x: 50%;
-    --y: 50%;
-}
-
-.weather-container:hover {
-    transform: perspective(1000px) rotateX(2deg) rotateY(2deg);
-}
-
-/* ---------- Nút chuyển đổi ---------- */
-.switch {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    --width-of-switch: 3.5em;
-    --height-of-switch: 2em;
-    --size-of-icon: 1.4em;
-    --slider-offset: 0.3em;
-    width: var(--width-of-switch);
-    height: var(--height-of-switch);
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #303136; /* Màu nền tối mặc định */
-    transition: .4s;
-    border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: var(--size-of-icon);
-    width: var(--size-of-icon);
-    border-radius: 20px;
-    left: var(--slider-offset);
-    top: 50%;
-    transform: translateY(-50%);
-    background: #303136;
-    box-shadow: 
-        inset -3px -2px 5px -2px #8983f7,
-        inset -10px -4px 0 0 #a3dafb;
-    transition: .4s;
-}
-
-/* Khi bật sang phải (chế độ sáng) */
-input:checked + .slider {
-    background-color: #f0f0f0;
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-input:checked + .slider:before {
-    left: calc(100% - (var(--size-of-icon) + var(--slider-offset)));
-    background: linear-gradient(40deg, #ffd700, #ff8c00);
-    box-shadow: 0 0 10px rgba(255, 140, 0, 0.2);
-    transform: translateY(-50%);
-}
-
-/* ---------- Chế độ màu ---------- */
-/* Mặc định: Tối */
-body {
-    background: #0a0a0a;
-    color: #fff;
-}
-
-/* Chế độ sáng */
-body.light-mode {
-    background: #f8f9fa;
-    color: #2c3e50;
-}
-
-/* Container */
-body.light-mode .weather-container {
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 
-        0 12px 40px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
-}
-
-/* Các thành phần khác */
-body.light-mode #temperature {
-    background: linear-gradient(45deg, #2c3e50, #34495e);
-}
-
-body.light-mode button {
-    background: linear-gradient(45deg, 
-        rgba(0, 0, 0, 0.05), 
-        rgba(0, 0, 0, 0.08));
-    color: #2c3e50;
-}
-
-.search-container input {
-    flex: 1;
-}
-
-.search-container button {
-    width: auto;
-    padding: 0 1.5rem;
-    background: linear-gradient(45deg, 
-        rgba(255, 255, 255, 0.12), 
-        rgba(255, 255, 255, 0.08));
-    border-radius: 14px;
+.sun-info {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 5px;
 }
 
-.search-container button i {
+.sun-info i {
+    color: #FFC107;
+}
+
+#uv-index {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.uv-low { color: #4CAF50; }
+.uv-moderate { color: #FFC107; }
+.uv-high { color: #FF9800; }
+.uv-very-high { color: #F44336; }
+.uv-extreme { color: #9C27B0; }
+
+/* ---------- Chất lượng không khí ---------- */
+
+.air-quality {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.air-quality h3 {
+    color: #f5f5f5;
+    margin-bottom: 1rem;
     font-size: 1.2rem;
 }
 
-.current-weather {
-    margin-bottom: 2rem;
+.air-quality-info {
+    display: grid;
+    gap: 1rem;
 }
+
+.air-quality-index {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.pollutant {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.light-mode .air-quality {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .air-quality h3 {
+    color: #2c3e50;
+}
+
+body.light-mode .air-quality-index {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+body.light-mode .pollutant {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* ---------- Bản đồ & biểu đồ ---------- */
+
+#map {
+    height: 300px;
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#tempChart {
+    width: 100%;
+    height: 300px;
+    margin-top: 1rem;
+}
+
+/* ---------- Dự báo 5 ngày ---------- */
 
 .forecast-container {
     margin-top: 2rem;
@@ -540,33 +638,13 @@ body.light-mode button {
     font-size: 0.9rem;
 }
 
-.details {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    margin: 2rem 0;
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
+.forecast-day:nth-child(1) { animation-delay: 0.1s; }
+.forecast-day:nth-child(2) { animation-delay: 0.2s; }
+.forecast-day:nth-child(3) { animation-delay: 0.3s; }
+.forecast-day:nth-child(4) { animation-delay: 0.4s; }
+.forecast-day:nth-child(5) { animation-delay: 0.5s; }
 
-.detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.detail-item span:first-child {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.9rem;
-}
-
-.detail-item span:last-child {
-    color: #a0d8ff;
-    font-size: 1.1rem;
-    font-weight: 500;
-}
+/* ---------- Thông báo lỗi ---------- */
 
 .error-message {
     color: #ff8080;
@@ -583,109 +661,92 @@ body.light-mode button {
     50% { opacity: 0.7; transform: scale(0.98); }
 }
 
-@media (max-width: 480px) {
-    .forecast {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .details {
-        grid-template-columns: 1fr;
-    }
-    
-    .search-container button {
-        padding: 0 1.2rem;
-    }
+body.light-mode .error-message {
+    color: #d64545;
 }
 
-.search-wrapper {
-    position: relative;
-    flex: 1;
+/* ---------- Trạng thái ẩn / hiện ---------- */
+
+.hidden {
+    opacity: 0;
+    height: 0;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.suggestions {
+/* ---------- Nút chuyển sáng/tối ---------- */
+
+.switch {
     position: absolute;
-    top: 100%;
+    top: 20px;
+    right: 20px;
+    --width-of-switch: 3.5em;
+    --height-of-switch: 2em;
+    --size-of-icon: 1.4em;
+    --slider-offset: 0.3em;
+    width: var(--width-of-switch);
+    height: var(--height-of-switch);
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    margin-top: 5px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-    backdrop-filter: blur(10px);
+    bottom: 0;
+    background-color: #303136;
+    transition: .4s;
+    border-radius: 30px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: var(--size-of-icon);
+    width: var(--size-of-icon);
+    border-radius: 20px;
+    left: var(--slider-offset);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #303136;
+    box-shadow:
+        inset -3px -2px 5px -2px #8983f7,
+        inset -10px -4px 0 0 #a3dafb;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #f0f0f0;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+input:checked + .slider:before {
+    left: calc(100% - (var(--size-of-icon) + var(--slider-offset)));
+    background: linear-gradient(40deg, #ffd700, #ff8c00);
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.2);
+    transform: translateY(-50%);
+}
+
+/* ---------- Hiệu ứng xuất hiện ---------- */
+
+@keyframes containerAppear {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes detailsAppear {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes forecastAppear {
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-.suggestion-item {
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: rgba(255, 255, 255, 0.8);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.suggestion-item:last-child {
-    border-bottom: none;
-}
-
-.suggestion-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
-
-.weather-container {
-    animation: containerAppear 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-@keyframes containerAppear {
-    from { 
-        opacity: 0;
-        transform: scale(0.95) translateY(20px);
-    }
-    to { 
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-.forecast-day {
-    animation: forecastAppear 0.5s ease forwards;
-    opacity: 0;
-    transform: translateY(20px);
-}
-
-@keyframes forecastAppear {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.forecast-day:nth-child(1) { animation-delay: 0.1s; }
-.forecast-day:nth-child(2) { animation-delay: 0.2s; }
-.forecast-day:nth-child(3) { animation-delay: 0.3s; }
-.forecast-day:nth-child(4) { animation-delay: 0.4s; }
-.forecast-day:nth-child(5) { animation-delay: 0.5s; }
-
-.details {
-    animation: detailsAppear 0.6s ease forwards;
-    opacity: 0;
-    transform: translateY(20px);
-}
-
-@keyframes detailsAppear {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 #weather-info {
@@ -694,171 +755,41 @@ body.light-mode button {
 }
 
 @keyframes weatherInfoAppear {
-    to {
-        opacity: 1;
+    to { opacity: 1; }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 480px) {
+    .weather-container {
+        padding: 1.5rem;
+        margin: 1rem;
     }
-}
 
-/* Thêm style cho UV index */
-#uv-index {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
+    input {
+        padding: 1rem;
+        font-size: 1rem;
+    }
 
-.uv-low { color: #4CAF50; }
-.uv-moderate { color: #FFC107; }
-.uv-high { color: #FF9800; }
-.uv-very-high { color: #F44336; }
-.uv-extreme { color: #9C27B0; }
+    .weather-icon {
+        width: 120px;
+        height: 125px;
+    }
 
-/* Thêm style cho thông tin mặt trời */
-.sun-info {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
+    .details {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
 
-.sun-info i {
-    color: #FFC107;
-}
+    button {
+        padding: 1rem 1.2rem;
+    }
 
-/* Thêm style cho air quality */
-.air-quality {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-}
+    .search-container button {
+        padding: 0 1.1rem;
+    }
 
-.air-quality h3 {
-    color: #f5f5f5;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-}
-
-.air-quality-info {
-    display: grid;
-    gap: 1rem;
-}
-
-.air-quality-index {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0.5rem;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.pollutant {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.03);
-}
-
-/* Thêm style cho chế độ sáng */
-body.light-mode .air-quality {
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .air-quality h3 {
-    color: #2c3e50;
-}
-
-body.light-mode .air-quality-index {
-    background: rgba(0, 0, 0, 0.03);
-}
-
-body.light-mode .pollutant {
-    background: rgba(0, 0, 0, 0.02);
-}
-
-/* Thêm style cho map */
-#map {
-    height: 300px;
-    width: 100%;
-    border-radius: 12px;
-    margin-top: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Thêm style cho chart */
-#tempChart {
-    width: 100%;
-    height: 300px;
-    margin-top: 1rem;
-}
-
-/* Thêm style cho alerts */
-.alert-item {
-    padding: 1rem;
-    margin: 0.5rem 0;
-    border-radius: 8px;
-    background: rgba(255, 0, 0, 0.1);
-    border: 1px solid rgba(255, 0, 0, 0.2);
-    animation: alertPulse 2s infinite;
-}
-
-@keyframes alertPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-}
-
-/* Thêm style cho chế độ sáng */
-body.light-mode .alert-item {
-    background: rgba(255, 0, 0, 0.05);
-    border: 1px solid rgba(255, 0, 0, 0.1);
-}
-
-/* Thêm style cho recent searches */
-.recent-searches {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.recent-searches h4 {
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.recent-city {
-    padding: 0.5rem;
-    margin: 0.25rem 0;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.recent-city:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* Thêm style cho chế độ sáng */
-body.light-mode .recent-searches {
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .recent-searches h4 {
-    color: rgba(0, 0, 0, 0.7);
-}
-
-body.light-mode .recent-city {
-    background: rgba(0, 0, 0, 0.03);
-}
-
-body.light-mode .recent-city:hover {
-    background: rgba(0, 0, 0, 0.05);
+    .forecast {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
